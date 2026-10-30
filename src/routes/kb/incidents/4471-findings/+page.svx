@@ -1,0 +1,70 @@
+---
+layout: runbook
+title: '#4471: separate causes behind the merged reports'
+owner: JanSochaczewski
+status: investigated
+reviewed: 2026-10-30
+signature: JanSochaczewski
+---
+
+<script>
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import QueueTimeline from '#lib/kb/QueueTimeline.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+</script>
+
+## Findings
+
+The [original incident](/kb/incidents/4471) describes one parser bug. Its rendered
+cause table shows different problems, not one fix reported repeatedly. These findings
+describe the supplied export, not a live view of the support desk.
+
+<CauseTable ticket={4471} />
+
+### Shared month-first parser
+
+The shared parser reads month first even when the tenant writes day first. In a
+day-first tenant, an intended 4 May written as `04/05/2026` can become 5 April.
+Read the tenant's locale before interpreting a date; the reporter's browser locale
+and intake tag do not establish the cause. Give this parser failure its own ticket.
+
+### Misleading booking-v3 date hint
+
+For a day-first tenant using booking-v3, the form prints `MM/DD/YYYY`, but interprets
+the submitted value in the tenant's day-first order. A person following that hint
+can therefore enter a different date from the one the form records. Correct the
+hint and verify its agreement with the form's actual interpretation. Give this
+form-hint failure a separate ticket; changing the shared parser alone does not
+correct the hint.
+
+## How to reproduce the classification
+
+Deduplicate the export by report ID, then select reports merged into ticket 4471.
+Join every report to its tenant by handle. Use the tenant's locale and booking-form
+version with `causeOf` in `src/lib/kb/causes.ts`; do not group by `meta.intakeTag`.
+The table above computes the report counts, affected tenants, date ranges, and
+intake-tag disagreements from that data.
+
+The reports noted as a one-day move are footnoted under their computed causes.
+That wording alone does not establish a third problem. Export rows repeated at
+page boundaries are not additional reports.
+
+## What the desk should change
+
+The [subject-only triage rule](/kb/triage/dedupe) cannot distinguish different causes
+with the same subject. Match the cause and affected context before merging. Treat
+that rule as historical guidance needing review, not proof that a report is a
+duplicate. Do not silently rewrite an accepted decision record; propose a new
+record if the desk changes its policy.
+
+<QueueTimeline ticket={4471} />
+
+The timeline distinguishes when reports arrived from when the desk merged them.
+A merge is a desk action, not the onset of a new failure. Neither the old page's
+recent review date nor its known status proves its one-fix claim.
+
+Track the two fixes independently in the
+[public investigation repository](https://github.com/JanSochaczewski/mega-what-it-shows/issues).
+Recheck the desk's current view before treating this export as its present state.
+
+<RenderStamp {signature} />
