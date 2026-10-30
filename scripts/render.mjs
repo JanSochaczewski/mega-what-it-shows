@@ -26,10 +26,11 @@ const server = await createServer({
 
 try {
   const { render } = await server.ssrLoadModule('svelte/server');
-  const { default: Page } = await server.ssrLoadModule('/src/routes/kb/incidents/4471-findings/+page.svx');
+  const { default: Page, metadata } = await server.ssrLoadModule('/src/routes/kb/incidents/4471-findings/+page.svx');
   const { deskRef } = await server.ssrLoadModule('/src/lib/kb/desk-ref.ts');
   const { head, body } = render(Page);
-  const signature = 'JanSochaczewski';
+  const signature = metadata.signature;
+  assert.equal(typeof signature, 'string', 'The page must declare its signature in frontmatter.');
   assert.ok(body.includes(deskRef(signature)), 'The rendered signature stamp must be visible.');
   assert.match(body, /379/);
   assert.match(body, /33/);
