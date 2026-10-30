@@ -21,6 +21,22 @@ describe the supplied export, not a live view of the support desk.
 
 <CauseTable ticket={4471} />
 
+## Engineering outcome: 5 October
+
+After the course accepted the two tickets, its
+[challenge page](https://hq.mega.dev/challenges/what-it-shows) displayed a new
+engineering update: support ticket #4471 closed on 5 October.
+
+- Parser: fixed by `fix(dates): parse dd/mm for eu locales`. The corresponding
+  [investigation issue](https://github.com/JanSochaczewski/mega-what-it-shows/issues/1)
+  can close as completed.
+- Hint: won't fix because the booking-v3 form was retired. The corresponding
+  [investigation issue](https://github.com/JanSochaczewski/mega-what-it-shows/issues/2)
+  can close as not planned. Retirement is not evidence that the hint was fixed.
+
+The export's counts below describe the historical reports. Closing the parent
+ticket does not mean every cause received a code fix.
+
 ### Shared month-first parser
 
 The shared parser reads month first even when the tenant writes day first. In a
